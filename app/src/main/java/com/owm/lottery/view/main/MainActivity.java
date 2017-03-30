@@ -1,4 +1,4 @@
-package com.owm.lottery;
+package com.owm.lottery.view.main;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,7 +9,12 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import com.owm.lottery.R;
+import com.owm.lottery.presenter.main.IMain;
+
+public class MainActivity extends AppCompatActivity implements IMain.MainView{
+
+    private IMain.MainPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
