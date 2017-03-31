@@ -233,4 +233,20 @@ public class O {
         return str == null || str.length() == 0 || str.equals("");
     }
 
+    /**
+     * 设置value值
+     * @param data 原数据
+     */
+    public static void setDateValue(List<Lottery> data) {
+        if (data == null || data.isEmpty()) {
+            return;
+        }
+        for (Lottery lottery : data) {
+            lottery.setDate(O.subDate(lottery.getOpentime()));
+            lottery.setExpectNumber(O.subExpect(lottery.getExpect()));
+            lottery.setWeek(O.getWeek(lottery.getOpentime()));
+            lottery.setSum(O.getSum(lottery.getOpencode()));
+        }
+    }
+
 }

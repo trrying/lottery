@@ -24,10 +24,10 @@ public class LotteryAdapter extends BaseQuickAdapter<Lottery, BaseViewHolder>{
 
     @Override
     protected void convert(BaseViewHolder helper, Lottery item) {
-        helper.setText(R.id.tv_date, O.subDate(item.getOpentime()));
-        helper.setText(R.id.tv_expect, O.subExpect(item.getExpect()));
-        helper.setText(R.id.tv_week, O.getWeek(item.getOpentime()));
-        helper.setText(R.id.tv_sum, O.getSum(item.getOpencode()));
+        helper.setText(R.id.tv_date, item.getDate());
+        helper.setText(R.id.tv_expect, item.getExpectNumber());
+        helper.setText(R.id.tv_week, item.getWeek());
+        helper.setText(R.id.tv_sum, item.getSum());
         String[] numbers = O.getNumber(item.getOpencode());
         for (int i = 0, size = numberIds.length/*Math.min(numbers.length, numberIds.length)*/; i < size; i++) {
             helper.setText(numberIds[i], i < numbers.length ? numbers[i] : "");

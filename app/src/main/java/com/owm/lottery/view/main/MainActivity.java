@@ -14,6 +14,7 @@ import android.view.View;
 import com.google.gson.Gson;
 import com.owm.lottery.R;
 import com.owm.lottery.model.apiplus.Lottery;
+import com.owm.lottery.model.apiplus.LotteryDao;
 import com.owm.lottery.model.apiplus.Result;
 import com.owm.lottery.model.utils.O;
 import com.owm.lottery.presenter.main.IMain;
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
         });
 
         rv_content = (RecyclerView) findViewById(R.id.rv_content);
+
+        initDate();
+    }
+
+    private void initDate() {
+        setAdapter(LotteryDao.selectOrderByExpect());
     }
 
     private void getData() {
@@ -63,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
     }
 
     private void setAdapter(List<Lottery> data) {
-        if (mAdapter == null) {
-
+        if (mAdapter == null || data != mAdapter.getData()) {
             rv_content.setLayoutManager(new LinearLayoutManager(this));
             rv_content.setAdapter(new LotteryAdapter(data));
         } else {
@@ -129,15 +135,17 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
                         while ((size = is.read(buffer)) >= 1) {
                             baos.write(buffer, 0 , size);
                         }
-                        final String result = new String(baos.toByteArray());
+                        final String resultStr = new String(baos.toByteArray());
                         Gson gson = new Gson();
-                        final Result result1 = gson.fromJson(result, Result.class);
+                        final Result result = gson.fromJson(resultStr, Result.class);
+                        O.setDateValue(result.getData());
+                        LotteryDao.save(result.getData());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Collections.reverse(result1.getData());
-                                O.appendLottery(result1.getData());
-                                setAdapter(result1.getData());
+                                Collections.reverse(result.getData());
+                                O.appendLottery(result.getData());
+                                setAdapter(result.getData());
                             }
                         });
                     }
