@@ -2,8 +2,11 @@ package com.owm.lottery.model.utils;
 
 import android.support.annotation.Nullable;
 
-import java.text.SimpleDateFormat;
+import com.owm.lottery.model.apiplus.Lottery;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +53,7 @@ public class O {
     }
 
     /**
-     * 期数是否是4的倍数
+     * 期数是否是4的倍数余1
      * @param data 原数据
      * @return 是:true
      */
@@ -58,7 +61,7 @@ public class O {
         boolean result = false;
         String expect = subExpect(data);
         if (!isEmpty(expect) && isNumeric(expect)) {
-            result = Integer.valueOf(expect) % 4 == 0;
+            result = Integer.valueOf(expect) % 4 == 1;
         }
         return result;
     }
@@ -70,38 +73,32 @@ public class O {
      */
     public static String getWeek(String date) {
         String result = "星期";
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(sdf.parse(date));
-            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            switch (dayOfWeek) {
-                case Calendar.SUNDAY:
-                    result += "日";
-                    break;
-                case Calendar.MONDAY:
-                    result += "一";
-                    break;
-                case Calendar.TUESDAY:
-                    result += "二";
-                    break;
-                case Calendar.WEDNESDAY:
-                    result += "三";
-                    break;
-                case Calendar.THURSDAY:
-                    result += "四";
-                    break;
-                case Calendar.FRIDAY:
-                    result += "五";
-                    break;
-                case Calendar.SATURDAY:
-                    result += "六";
-                    break;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+        int dayOfWeek = DateUtils.getWeekValue(date);
+        switch (dayOfWeek) {
+            case Calendar.SUNDAY:
+                result += "日";
+                break;
+            case Calendar.MONDAY:
+                result += "一";
+                break;
+            case Calendar.TUESDAY:
+                result += "二";
+                break;
+            case Calendar.WEDNESDAY:
+                result += "三";
+                break;
+            case Calendar.THURSDAY:
+                result += "四";
+                break;
+            case Calendar.FRIDAY:
+                result += "五";
+                break;
+            case Calendar.SATURDAY:
+                result += "六";
+                break;
+            default:
+                result = "";
+                break;
         }
         return result;
     }
@@ -148,6 +145,83 @@ public class O {
         Matcher isNum = pattern.matcher(str);
 
         return isNum.matches();
+    }
+
+    /**
+     * 追加 Lottery，默认在末尾追加4个
+     * @param data 原数据
+     */
+    public static void appendLottery(List<Lottery> data) {
+        appendLottery(data, data != null ? data.size() - 1 : 0, 4);
+    }
+
+    /**
+     * 追加 Lottery
+     * @param data 原数据
+     * @param startPosition 追加开始下标
+     * @param count 追加数量
+     */
+    public static void appendLottery(List<Lottery> data, int startPosition, int count) {
+        if (data == null) {
+            data = new ArrayList<>();
+        }
+        if (data.isEmpty()) {
+            Lottery lottery = new Lottery();
+
+            lottery.setOpentimestamp(System.currentTimeMillis() + (getNextOpenDay() * DateUtils.ONE_DAY_MILLIS));
+            lottery.setOpentime(DateUtils.getDateFormatString(lottery.getOpentimestamp()));
+            lottery.setExpect(String.format(Locale.CHINA, DateUtils.getCurrentYear() + "%03d", 1));
+
+            data.add(lottery);
+
+            count--;
+        }
+        if (startPosition < 0 || startPosition >= data.size()) {
+            startPosition = data.size() - 1;
+        }
+        for (int i = startPosition, size = startPosition + count; i < size; i++) {
+            long timeMillis = data.get(i).getOpentimestamp();
+            timeMillis += DateUtils.ONE_DAY_MILLIS * (DateUtils.getWeekValue(data.get(i).getOpentime()) == Calendar.TUESDAY ? 3 : 2);
+
+            Lottery lottery = new Lottery();
+            lottery.setOpentime(DateUtils.getDateFormatString(timeMillis));
+            lottery.setExpect(String.format(Locale.CHINA, DateUtils.getCurrentYear() + "%03d", Integer.valueOf(subExpect(data.get(i).getExpect())) + 1));
+
+            data.add(lottery);
+        }
+    }
+
+    /**
+     * 获取距离下次开奖天数
+     * @return 间隔天数
+     */
+    public static int getNextOpenDay() {
+        int result = 0;
+        int week = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        switch (week) {
+            case Calendar.SUNDAY:
+                result = 0;
+                break;
+            case Calendar.MONDAY:
+                result = 1;
+                break;
+            case Calendar.TUESDAY:
+                result = 0;
+                break;
+            case Calendar.WEDNESDAY:
+                result = 2;
+                break;
+            case Calendar.THURSDAY:
+                result = 1;
+                break;
+            case Calendar.FRIDAY:
+                result = 0;
+                break;
+            case Calendar.SATURDAY:
+                result = 1;
+                break;
+        }
+        return result;
     }
 
     /**

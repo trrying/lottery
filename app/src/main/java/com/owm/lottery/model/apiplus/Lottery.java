@@ -16,7 +16,7 @@ public class Lottery {
     private String expect;
     private String opencode;
     private String opentime;
-    private int opentimestamp;
+    private long opentimestamp;
 
     public String getExpect() {
         return expect;
@@ -42,11 +42,11 @@ public class Lottery {
         this.opentime = opentime;
     }
 
-    public int getOpentimestamp() {
+    public long getOpentimestamp() {
         return opentimestamp;
     }
 
-    public void setOpentimestamp(int opentimestamp) {
+    public void setOpentimestamp(long opentimestamp) {
         this.opentimestamp = opentimestamp;
     }
 }

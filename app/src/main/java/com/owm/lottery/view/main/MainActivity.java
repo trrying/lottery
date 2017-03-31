@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.owm.lottery.R;
 import com.owm.lottery.model.apiplus.Lottery;
 import com.owm.lottery.model.apiplus.Result;
+import com.owm.lottery.model.utils.O;
 import com.owm.lottery.presenter.main.IMain;
 import com.owm.lottery.view.adapter.main.LotteryAdapter;
 
@@ -135,10 +136,7 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
                             @Override
                             public void run() {
                                 Collections.reverse(result1.getData());
-                                result1.getData().add(new Lottery());
-                                result1.getData().add(new Lottery());
-                                result1.getData().add(new Lottery());
-                                result1.getData().add(new Lottery());
+                                O.appendLottery(result1.getData());
                                 setAdapter(result1.getData());
                             }
                         });
