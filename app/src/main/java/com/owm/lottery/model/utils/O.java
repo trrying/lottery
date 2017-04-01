@@ -2,12 +2,16 @@ package com.owm.lottery.model.utils;
 
 import android.support.annotation.Nullable;
 
+import com.owm.lottery.model.apiplus.Graph;
 import com.owm.lottery.model.apiplus.Lottery;
+import com.owm.lottery.model.apiplus.Point;
+import com.owm.lottery.model.common.AppHolder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +27,9 @@ public class O {
         System.out.println(getWeek("2017-03-30 20:34:00"));
         System.out.println(subExpect("2017032"));
         System.out.println(getSum("5,1,1,8,3,2,0"));
+        for (int i = 0; i < 20; i++) {
+            System.out.println(AppHolder.getGsonExpose().toJson(getComputeData(5, 3)));
+        }
     }
     
     /**
@@ -133,6 +140,24 @@ public class O {
             return data.split(",");
         }
         return new String[]{};
+    }
+
+    /**
+     * 解析码数
+     * @param data 原数据
+     * @return 码数
+     */
+    public static int[] getNumberInt(String data) {
+        int[] results = null;
+        if (!isEmpty(data)){
+            String[] strings = data.split(",");
+            for (String string : strings) {
+                if (isNumeric(string)) {
+
+                }
+            }
+        }
+        return results;
     }
 
     /**
@@ -247,6 +272,100 @@ public class O {
             lottery.setWeek(O.getWeek(lottery.getOpentime()));
             lottery.setSum(O.getSum(lottery.getOpencode()));
         }
+    }
+
+    /**
+     * 获取随机测试数据
+     * @param expectSize 期数范围
+     * @param xSize 多少个点
+     * @return 测试数据
+     */
+    public static List<Point> getComputeData(int expectSize, int xSize) {
+        return getComputeData(expectSize, xSize, 7);
+    }
+
+    /**
+     * 获取随机测试数据
+     * @param expectSize 期数范围
+     * @param xSize 多少个点
+     * @param ySize 点的取值范围
+     * @return 测试数据
+     */
+    public static List<Point> getComputeData(int expectSize, int xSize, int ySize) {
+        List<Point> result = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < xSize; i++) {
+            boolean isExist = false;
+            //获取随机坐标
+            int x = i == 0 ? 0 : random.nextInt(expectSize);
+            int y = random.nextInt(i == 0 ? 4 : ySize);
+            //判断坐标是否出现过
+            if (!result.isEmpty()) {
+                for (int j = result.size() - 1; j < result.size(); j++) {
+                    isExist = result.get(j).getX() == x && result.get(j).getY() == y;
+                    if (isExist) {
+                        break;
+                    }
+                }
+            }
+            //保存或者重新获取
+            if (!isExist) {
+                Point point = new Point();
+                point.setX(x);
+                point.setY(y);
+                result.add(point);
+            } else {
+                i--;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取不重复随机数
+     * @param total 随机数范围 0~total
+     * @param count 随机数个数 count < total
+     * @return 随机数
+     */
+    public static Integer[] GetRandomSequence1(int total, int count){
+        List<Integer> input = new ArrayList<>();
+        if (count > total) {
+            total = count;
+        }
+        for (int i = 0; i < total; i++){
+            input.add(i);
+        }
+
+        List<Integer> output = new ArrayList<>();
+
+        Random random = new Random();
+        int end = total;
+        for (int i = 0; i < count; i++){
+            int num = random.nextInt(end);
+            output.add(input.get(num));
+            input.remove(i);
+            end--;
+        }
+        Integer[] result = new Integer[output.size()];
+        output.toArray(result);
+        return result;
+    }
+
+    /**
+     * 获取一个划图的步宽
+     * @param graph 划图
+     * @return 步宽
+     */
+    public static int getExpectRange(Graph graph) {
+        int result = 0;
+        if (graph == null ||graph.getPoints() == null || graph.getPoints().isEmpty()) {
+            return result;
+        }
+        for (int i = 0; i < graph.getPoints().size(); i++) {
+            result = Math.max(result, graph.getPoints().get(i).getX());
+        }
+        return result;
     }
 
 }

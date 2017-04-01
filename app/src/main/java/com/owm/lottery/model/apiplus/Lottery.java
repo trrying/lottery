@@ -115,4 +115,5 @@ public class Lottery {
     public void setExpectNumber(String expectNumber) {
         this.expectNumber = expectNumber;
     }
+
 }

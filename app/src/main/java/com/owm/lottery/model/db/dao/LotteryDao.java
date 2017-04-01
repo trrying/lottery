@@ -1,6 +1,8 @@
-package com.owm.lottery.model.apiplus;
+package com.owm.lottery.model.db.dao;
 
+import com.owm.lottery.model.apiplus.Lottery;
 import com.owm.lottery.model.db.DbManagerHelper;
+import com.owm.lottery.model.utils.DbUtils;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -34,7 +36,6 @@ public class LotteryDao {
         }
     }
 
-
     public static List<Lottery> selectOrderByExpect() {
         List<Lottery> result = null;
         DbManager db = x.getDb(DbManagerHelper.getDaoConfig());
@@ -44,5 +45,15 @@ public class LotteryDao {
             e.printStackTrace();
         }
         return result != null ? result : new ArrayList<Lottery>();
+    }
+
+    public static Lottery selectById(int lotteryId){
+        Lottery lottery = null;
+        try {
+            lottery = DbUtils.getDbManager().findById(Lottery.class, lotteryId);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return lottery;
     }
 }

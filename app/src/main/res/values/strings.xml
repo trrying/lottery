@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">let go</string>
+    <string name="app_name">forecast</string>
     <string name="action_settings">Settings</string>
 
     <string name="lottery_week">星期%s</string>
