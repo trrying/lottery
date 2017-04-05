@@ -118,11 +118,11 @@ public class O {
     public static String getSum(String data) {
         String result = "";
         String[] split;
-        if (!isEmpty(data) && (split = data.split(",")).length > 0) {
+        if (!isEmpty(data) && (split = data.split(",")).length > 4) {
             int sum = 0;
-            for (String num : split) {
-                if (isNumeric(num)) {
-                    sum += Integer.valueOf(num);
+            for (int i = 0; i < 4; i++) {
+                if (isNumeric(split[i])) {
+                    sum += Integer.valueOf(split[i]);
                 }
             }
             result = String.valueOf(sum);
