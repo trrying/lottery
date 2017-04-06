@@ -55,4 +55,15 @@ public class GraphDao {
         }
         return result != null ? result : new ArrayList<Lottery>();
     }
+
+    public static int selectCount() {
+        int result = 0;
+        DbManager db = x.getDb(DbManagerHelper.getDaoConfig());
+        try {
+            result = (int) db.selector(Graph.class).count();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }

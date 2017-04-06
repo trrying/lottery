@@ -2,7 +2,7 @@ package com.owm.lottery.model.common;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.owm.lottery.model.event.IEvent;
+import com.owm.lottery.model.event.common.IEvent;
 
 import io.reactivex.subjects.PublishSubject;
 
@@ -16,6 +16,7 @@ public class AppHolder {
     private static PublishSubject<IEvent> sEventBus;
     private static final Object sRxLock = new Object();
 
+    private static Gson gsonExpose;
     private static Gson gson;
     private static final Object sGsonLock = new Object();
 
@@ -31,10 +32,21 @@ public class AppHolder {
     }
 
     public static Gson getGsonExpose() {
+        if (gsonExpose == null) {
+            synchronized (sGsonLock) {
+                if (gsonExpose == null) {
+                    gsonExpose = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+                }
+            }
+        }
+        return gsonExpose;
+    }
+
+    public static Gson getGson() {
         if (gson == null) {
             synchronized (sGsonLock) {
                 if (gson == null) {
-                    gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+                    gson = new Gson();
                 }
             }
         }

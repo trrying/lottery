@@ -9,8 +9,10 @@ import com.owm.lottery.model.apiplus.Graph;
 import com.owm.lottery.model.apiplus.Lottery;
 import com.owm.lottery.model.apiplus.Point;
 import com.owm.lottery.model.common.AppHolder;
+import com.owm.lottery.model.db.dao.GraphDao;
 import com.owm.lottery.model.db.dao.LotteryDao;
 import com.owm.lottery.model.utils.O;
+import com.owm.lottery.model.utils.SharedPreferencesUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class ComputeService extends Service {
             computeThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    compute();
+                    compute(O.getComputeInfo(getApplicationContext()));
                 }
             });
             computeThread.start();
@@ -59,40 +61,61 @@ public class ComputeService extends Service {
         return null;
     }
 
-    private void compute() {
+    private void compute(int[] ints) {
         while (isCompute) {
-            Graph graph = new Graph();
-            List<Point> pointList = O.getComputeData(5, 3);
-            graph.setPoints(pointList);
-            graph.setStartExpect(O.subExpect(mLotteryList.get(0).getExpect()));
-            graph.setPointLocation(AppHolder.getGsonExpose().toJson(pointList));
-            int expectRange = O.getExpectRange(graph);
-            if (expectRange == 0) {
-                break;
-            }
 
-            //循环 将各个规律的不同间距 计算出来，
-            for (int i = 1, iSize = mLotteryList.size() / expectRange; i < iSize; i++) {
-                int[] sums = new int[pointList.size()];
-                //循环 计算等间距 几个规律的 周期和的数组
-                for (int j = 0, jSize = mLotteryList.size() / (expectRange + i); j < jSize; j++) {
-                    //循环 计算一个周期的 和
-                    for (int k = 0; k < pointList.size(); k++) {
-                        if (j == 0) {
-                            break;
+            for (int expectSize = ints[0]; expectSize < 10; expectSize++) {
+                for (int xSize = ints[1]; xSize < 6; xSize++) {
+
+                    Graph graph = new Graph();
+                    List<Point> pointList = O.getComputeData(expectSize, xSize);
+                    graph.setPoints(pointList);
+                    graph.setStartExpect(O.subExpect(mLotteryList.get(0).getExpect()));
+                    graph.setPointLocation(AppHolder.getGsonExpose().toJson(pointList));
+                    int expectRange = O.getExpectRange(graph);
+                    if (expectRange == 0) {
+                        break;
+                    }
+
+                    //循环 将各个规律的不同间距 计算出来，
+                    for (int i = ints[2], iSize = mLotteryList.size() / expectRange; i < iSize; i++) {
+                        int[] sums = new int[100];
+                        //循环 计算等间距 几个规律的 周期和的数组
+                        for (int j = ints[3], jSize = mLotteryList.size() / (expectRange + i); j < jSize; j++) {
+                            //循环 计算一个周期的 和
+                            for (int k = 0; k < pointList.size(); k++) {
+                                if (j == 0) {
+                                    break;
+                                }
+                                String openCode = mLotteryList.get(pointList.get(k).getX()).getOpencode();
+                                int y = pointList.get(k).getY();
+                                sums[j] += (O.getNumberInt(openCode))[y];
+                            }
                         }
-                        sums[j] += (O.getNumberInt(mLotteryList.get(pointList.get(k).getX()).getOpencode()))[pointList.get(k).getY()];
+
+                        //计算等间距的一个规律的 成功率
+                        HashMap<Integer, Integer> map = new HashMap<>();
+                        for (int sum : sums) {
+                            map.put(sum, map.containsKey(sum) ? map.get(sum) + 1 : 1);
+                        }
+                        map.remove(0);
+                        float keySum = 0;
+                        for (int key : map.keySet()) {
+                            if (map.get(key) > keySum) {
+                                keySum = map.get(key);
+                            }
+                        }
+                        if (keySum / sums.length > 0.7) {
+                            Graph graphTemp = O.cloneObject(graph, Graph.class);
+                            graphTemp.setId(0);
+                            graphTemp.setPercentage(keySum / sums.length);
+                            graphTemp.setGapExpect(i);
+                            GraphDao.save(graphTemp);
+                        }
+                        //保存计算进度
+                        SharedPreferencesUtil.putCompute(getApplicationContext(), ""+expectSize + xSize + i + 0);
                     }
                 }
-
-                //计算等间距的一个规律的 成功率
-                HashMap<Integer, Integer> map = new HashMap<>();
-                for (int sum : sums) {
-                    if (map.containsKey(sum)) {
-                        map.put(sum, map.get(sum) + 1);
-                    }
-                }
-
             }
         }
     }

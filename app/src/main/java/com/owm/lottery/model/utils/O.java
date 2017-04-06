@@ -1,5 +1,6 @@
 package com.owm.lottery.model.utils;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.owm.lottery.model.apiplus.Graph;
@@ -151,9 +152,10 @@ public class O {
         int[] results = null;
         if (!isEmpty(data)){
             String[] strings = data.split(",");
-            for (String string : strings) {
-                if (isNumeric(string)) {
-
+            results = new int[strings.length];
+            for (int i = 0; i < strings.length; i++) {
+                if (isNumeric(strings[i])) {
+                    results[i] = Integer.valueOf(strings[i]);
                 }
             }
         }
@@ -170,6 +172,23 @@ public class O {
         Matcher isNum = pattern.matcher(str);
 
         return isNum.matches();
+    }
+
+    /**
+     * 判断是否全部都是纯数字
+     * @param strs 原数据
+     * @return 全部是:true
+     */
+    private static boolean isNumeric(String[] strs) {
+        boolean result = true;
+        Pattern pattern = Pattern.compile("[0-9]*");
+        for (String str : strs) {
+            if (!pattern.matcher(str).matches()) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -366,6 +385,31 @@ public class O {
             result = Math.max(result, graph.getPoints().get(i).getX());
         }
         return result;
+    }
+
+    public static int[] getComputeInfo(Context context) {
+        String compute = SharedPreferencesUtil.getCompute(context);
+        String[] split;
+        if (O.isEmpty(compute) && (split = compute.split(",")).length == 4 && isNumeric(split)) {
+            int[] ints = new int[split.length];
+            for (int i = 0; i < ints.length; i++) {
+                ints[i] = Integer.valueOf(split[i]);
+            }
+            return ints;
+        } else {
+            return new int[]{2,2,1,0};
+        }
+    }
+
+    /**
+     * 克隆一个对象
+     * @param obj 数据源
+     * @param classType 数据类型
+     * @param <T> 数据类型
+     * @return 新的对象
+     */
+    public static <T> T cloneObject(Object obj,Class<T> classType) {
+        return AppHolder.getGson().fromJson(AppHolder.getGson().toJson(obj), classType);
     }
 
 }

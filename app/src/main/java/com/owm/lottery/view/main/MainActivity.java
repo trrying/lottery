@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 getData();
+                startService(new Intent(MainActivity.this, ComputeService.class));
             }
         });
 
@@ -65,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
 
     private void initDate() {
         setAdapter(LotteryDao.selectOrderByExpect());
-        startService(new Intent(this, ComputeService.class));
     }
 
     private void getData() {

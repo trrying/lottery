@@ -1,4 +1,4 @@
-package com.owm.lottery.model.event;
+package com.owm.lottery.model.event.common;
 
 /**
  * RxBus Base Event
