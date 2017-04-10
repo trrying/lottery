@@ -5,7 +5,10 @@
     <string name="lottery_week">星期%s</string>
 
     <string name="lottery_result">lottery</string>
-    <string name="lottery_forecast">预测</string>
-    <string name="lottery_about_me">关于</string>
+    <string name="lottery_predict">predict</string>
+    <string name="lottery_setting">setting</string>
+
+    <string name="predict_start">start</string>
+    <string name="predict_stop">stop</string>
 
 </resources>

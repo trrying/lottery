@@ -1,7 +1,10 @@
 package com.owm.lottery.model.db.dao;
 
 import com.owm.lottery.model.apiplus.Lottery;
+import com.owm.lottery.model.common.AppHolder;
+import com.owm.lottery.model.common.CGP;
 import com.owm.lottery.model.db.DbManagerHelper;
+import com.owm.lottery.model.event.DataChangeEvent;
 import com.owm.lottery.model.utils.DbUtils;
 
 import org.xutils.DbManager;
@@ -30,6 +33,8 @@ public class LotteryDao {
                     data.get(i).setId(expect.getId());
                 }
                 db.saveOrUpdate(data.get(i));
+
+                AppHolder.getEventBus().onNext(DataChangeEvent.create(Lottery.class.getName(), CGP.HandlerEvent.TYPE_ADDED));
             } catch (DbException e) {
                 e.printStackTrace();
             }

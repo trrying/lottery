@@ -14,6 +14,9 @@ import com.owm.lottery.model.db.dao.LotteryDao;
 import com.owm.lottery.model.utils.O;
 import com.owm.lottery.model.utils.SharedPreferencesUtil;
 
+import org.xutils.x;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,34 +28,46 @@ import java.util.List;
 
 public class ComputeService extends Service {
 
-    private List<Lottery> mLotteryList;
+    private static List<Lottery> mLotteryList = new ArrayList<>();
 
-    Thread computeThread;
+    private static Thread computeThread;
 
-    private boolean isCompute = true;
+    private static boolean isRunning = false;
+
+    private static boolean isCompute = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mLotteryList = LotteryDao.selectOrderByExpect();
-        Collections.reverse(mLotteryList);
+    }
 
-        if (computeThread == null) {
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    public static boolean isCompute() {
+        return isCompute;
+    }
+
+    public static void setIsCompute(boolean isCompute) {
+        ComputeService.isCompute = isCompute;
+        if (isCompute && !isRunning) {
             computeThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    compute(O.getComputeInfo(getApplicationContext()));
+                    compute(O.getComputeInfo(x.app()));
                 }
             });
             computeThread.start();
         }
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return super.onStartCommand(intent, flags, startId);
+    public static void initDate() {
+        mLotteryList.clear();
+        mLotteryList = LotteryDao.selectOrderByExpect();
+        Collections.reverse(mLotteryList);
     }
 
     @Nullable
@@ -61,63 +76,72 @@ public class ComputeService extends Service {
         return null;
     }
 
-    private void compute(int[] ints) {
-        while (isCompute) {
+    private static void compute(int[] ints) {
+        isRunning = true;
+        if (mLotteryList.isEmpty()) {
+            initDate();
+            if (mLotteryList.isEmpty()) {
+                isCompute = false;
+            }
+        }
+        try {
+            while (isCompute) {
+                for (int expectSize = ints[0]; expectSize < 10 && isCompute; expectSize++) {
+                    for (int xSize = ints[1]; xSize < 6 && isCompute; xSize++) {
 
-            for (int expectSize = ints[0]; expectSize < 10; expectSize++) {
-                for (int xSize = ints[1]; xSize < 6; xSize++) {
+                        Graph graph = new Graph();
+                        List<Point> pointList = O.getComputeData(expectSize, xSize);
+                        graph.setPoints(pointList);
+                        graph.setStartExpect(O.subExpect(mLotteryList.get(0).getExpect()));
+                        graph.setPointLocation(AppHolder.getGsonExpose().toJson(pointList));
+                        int expectRange = O.getExpectRange(graph);
+                        if (expectRange == 0) {
+                            break;
+                        }
 
-                    Graph graph = new Graph();
-                    List<Point> pointList = O.getComputeData(expectSize, xSize);
-                    graph.setPoints(pointList);
-                    graph.setStartExpect(O.subExpect(mLotteryList.get(0).getExpect()));
-                    graph.setPointLocation(AppHolder.getGsonExpose().toJson(pointList));
-                    int expectRange = O.getExpectRange(graph);
-                    if (expectRange == 0) {
-                        break;
-                    }
-
-                    //循环 将各个规律的不同间距 计算出来，
-                    for (int i = ints[2], iSize = mLotteryList.size() / expectRange; i < iSize; i++) {
-                        int[] sums = new int[100];
-                        //循环 计算等间距 几个规律的 周期和的数组
-                        for (int j = ints[3], jSize = mLotteryList.size() / (expectRange + i); j < jSize; j++) {
-                            //循环 计算一个周期的 和
-                            for (int k = 0; k < pointList.size(); k++) {
-                                if (j == 0) {
-                                    break;
+                        //循环 将各个规律的不同间距 计算出来，
+                        for (int i = ints[2], iSize = mLotteryList.size() / expectRange; i < iSize && isCompute; i++) {
+                            int[] sums = new int[100];
+                            //循环 计算等间距 几个规律的 周期和的数组
+                            for (int j = ints[3], jSize = mLotteryList.size() / (expectRange + i); j < jSize; j++) {
+                                //循环 计算一个周期的 和
+                                for (int k = 0; k < pointList.size(); k++) {
+                                    if (j == 0) {
+                                        break;
+                                    }
+                                    String openCode = mLotteryList.get(pointList.get(k).getX()).getOpencode();
+                                    int y = pointList.get(k).getY();
+                                    sums[j] += (O.getNumberInt(openCode))[y];
                                 }
-                                String openCode = mLotteryList.get(pointList.get(k).getX()).getOpencode();
-                                int y = pointList.get(k).getY();
-                                sums[j] += (O.getNumberInt(openCode))[y];
                             }
-                        }
 
-                        //计算等间距的一个规律的 成功率
-                        HashMap<Integer, Integer> map = new HashMap<>();
-                        for (int sum : sums) {
-                            map.put(sum, map.containsKey(sum) ? map.get(sum) + 1 : 1);
-                        }
-                        map.remove(0);
-                        float keySum = 0;
-                        for (int key : map.keySet()) {
-                            if (map.get(key) > keySum) {
-                                keySum = map.get(key);
+                            //计算等间距的一个规律的 成功率
+                            HashMap<Integer, Integer> map = new HashMap<>();
+                            for (int sum : sums) {
+                                map.put(sum, map.containsKey(sum) ? map.get(sum) + 1 : 1);
                             }
-                        }
-                        if (keySum / sums.length > 0.7) {
+                            map.remove(0);
+                            float keySum = 0;
+                            for (int key : map.keySet()) {
+                                if (map.get(key) > keySum) {
+                                    keySum = map.get(key);
+                                }
+                            }
                             Graph graphTemp = O.cloneObject(graph, Graph.class);
                             graphTemp.setId(0);
                             graphTemp.setPercentage(keySum / sums.length);
                             graphTemp.setGapExpect(i);
                             GraphDao.save(graphTemp);
+                            //保存计算进度
+                            SharedPreferencesUtil.putCompute(x.app(), "" + expectSize + xSize + i + 0);
                         }
-                        //保存计算进度
-                        SharedPreferencesUtil.putCompute(getApplicationContext(), ""+expectSize + xSize + i + 0);
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        isRunning = false;
     }
 
 }

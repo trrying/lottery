@@ -10,6 +10,19 @@ import android.graphics.Typeface;
 
 public class CGP {
 
+    public static class HandlerEvent{
+        /**  添加 操作  */
+        public static final int TYPE_ADD = 0x1;
+        /**  添加完成 操作  */
+        public static final int TYPE_ADDED = 0x2;
+        /**  更新操作  */
+        public static final int TYPE_UPDATE = 0x3;
+        /**  删除操作  */
+        public static final int TYPE_DELETE = 0x4;
+        /**  有改变操作  */
+        public static final int TYPE_CHANGE = 0x5;
+    }
+
 
     private static Typeface mCharType;   // 中文字体
     private static Typeface mNumberType;    // 英文数字字体

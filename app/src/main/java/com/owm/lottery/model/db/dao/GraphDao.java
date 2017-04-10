@@ -56,14 +56,52 @@ public class GraphDao {
         return result != null ? result : new ArrayList<Lottery>();
     }
 
-    public static int selectCount() {
-        int result = 0;
+    /**
+     * 获取总条数
+     * @return 总条数
+     */
+    public static long selectCount() {
+        long result = 0;
         DbManager db = x.getDb(DbManagerHelper.getDaoConfig());
         try {
-            result = (int) db.selector(Graph.class).count();
+            result = db.selector(Graph.class).count();
         } catch (DbException e) {
             e.printStackTrace();
         }
         return result;
     }
+
+    /**
+     * 查询条数 在begin~end之前
+     * @param begin 前面
+     * @param end 后面
+     * @return 条数
+     */
+    public static long selectCountByPercentage(float begin, float end) {
+        long result = 0;
+        DbManager db = x.getDb(DbManagerHelper.getDaoConfig());
+        try {
+            result = db.selector(Graph.class).where("percentage", "BETWEEN", new Float[]{begin, end}).count();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 查询 Graph.percentage = percentage 的条数
+     * @param percentage percentage
+     * @return 条数
+     */
+    public static long selectCountByPercentage(float percentage) {
+        long result = 0;
+        DbManager db = x.getDb(DbManagerHelper.getDaoConfig());
+        try {
+            result = db.selector(Graph.class).where("percentage", "=", percentage).count();
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }

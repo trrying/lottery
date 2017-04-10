@@ -12,7 +12,7 @@ public class DbManagerHelper {
     /**  数据库名称  */
     public static final String DB_NAME = "lottery.db";
     /**  数据库版本  */
-    public static final int DB_VERSON = 1;
+    public static final int DB_VERSION = 1;
 
     public static DbManager.DaoConfig daoConfig;
 
@@ -22,7 +22,7 @@ public class DbManagerHelper {
                 if (daoConfig == null) {
                     daoConfig = new DbManager.DaoConfig()
                             .setDbName(DB_NAME)
-                            .setDbVersion(DB_VERSON)
+                            .setDbVersion(DB_VERSION)
                             .setDbOpenListener(new DbManager.DbOpenListener() {
                                 @Override
                                 public void onDbOpened(DbManager db) {

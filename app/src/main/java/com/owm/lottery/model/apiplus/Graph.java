@@ -1,6 +1,7 @@
 package com.owm.lottery.model.apiplus;
 
 import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  * Created by ouweiming on 2017/3/31.
  */
 
+@Table(name = "graph")
 public class Graph {
 
     @Column(name = "id", isId = true)

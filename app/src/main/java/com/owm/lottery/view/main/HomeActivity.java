@@ -1,5 +1,6 @@
 package com.owm.lottery.view.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import com.owm.lottery.R;
 import com.owm.lottery.view.adapter.commit.ViewPagerAdapter;
 import com.owm.lottery.view.common.BaseActivity;
+import com.owm.lottery.view.service.ComputeService;
 
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
@@ -33,7 +35,7 @@ public class HomeActivity extends BaseActivity {
 
     private ViewPagerAdapter mPagerAdapter;
     private Fragment[] mFragments = new Fragment[]{new LotteryResultFragment(),
-            new LotteryResultFragment(), new LotteryResultFragment()};
+            new PredictLotteryFragment(), new SettingFragment()};
     private int[] itemId = new int[]{R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications};
 
     @Override
@@ -77,5 +79,7 @@ public class HomeActivity extends BaseActivity {
             }
         });
         viewpager.setCurrentItem(0);
+
+        startService(new Intent(this, ComputeService.class));
     }
 }
