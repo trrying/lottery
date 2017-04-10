@@ -14,12 +14,10 @@ import android.view.View;
 
 import com.google.gson.Gson;
 import com.owm.lottery.R;
-import com.owm.lottery.model.apiplus.Graph;
 import com.owm.lottery.model.apiplus.Lottery;
-import com.owm.lottery.model.db.dao.LotteryDao;
 import com.owm.lottery.model.apiplus.Result;
+import com.owm.lottery.model.db.dao.LotteryDao;
 import com.owm.lottery.model.utils.O;
-import com.owm.lottery.view.service.ComputeService;
 import com.owm.lottery.presenter.main.IMain;
 import com.owm.lottery.view.adapter.main.LotteryAdapter;
 
@@ -54,8 +52,9 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                getData();
-                startService(new Intent(MainActivity.this, ComputeService.class));
+//                getData();
+//                startService(new Intent(MainActivity.this, ComputeService.class));
+                startActivity(new Intent(MainActivity.this, HomeActivity.class));
             }
         });
 
@@ -69,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
     }
 
     private void getData() {
-//        getDateXUtils();
-        getDate4HttpURLConnection();
+        getDateXUtils();
+//        getDate4HttpURLConnection();
     }
 
     private void setAdapter(List<Lottery> data) {
@@ -112,7 +111,13 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
             }
         });
     }
-
+//
+//    private void getDate4Rx() {
+//        Observable.fromArray()
+//                .flatMap(new Function<Object, ObservableSource<?>>() {
+//                })
+//    }
+//
     private void getDate4HttpURLConnection() {
 
         new Thread(new Runnable() {
@@ -182,16 +187,6 @@ public class MainActivity extends AppCompatActivity implements IMain.MainView{
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //1、随机生成几个点，连线，计算值，往上推>5的周期，准确率大于80的记录
-    private void forecast() {
-        List<Lottery> lotteries = LotteryDao.selectOrderByExpect();
-
-        for (int i = 0; i < 10; i++) {
-            Graph graph = new Graph();
-
-        }
     }
 
 }

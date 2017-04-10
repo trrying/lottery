@@ -4,4 +4,8 @@
 
     <string name="lottery_week">星期%s</string>
 
+    <string name="lottery_result">lottery</string>
+    <string name="lottery_forecast">预测</string>
+    <string name="lottery_about_me">关于</string>
+
 </resources>

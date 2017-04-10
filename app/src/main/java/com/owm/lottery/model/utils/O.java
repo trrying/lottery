@@ -195,8 +195,8 @@ public class O {
      * 追加 Lottery，默认在末尾追加4个
      * @param data 原数据
      */
-    public static void appendLottery(List<Lottery> data) {
-        appendLottery(data, data != null ? data.size() - 1 : 0, 4);
+    public static List<Lottery> appendLottery(List<Lottery> data) {
+        return appendLottery(data, data != null ? data.size() - 1 : 0, 4);
     }
 
     /**
@@ -205,7 +205,7 @@ public class O {
      * @param startPosition 追加开始下标
      * @param count 追加数量
      */
-    public static void appendLottery(List<Lottery> data, int startPosition, int count) {
+    public static List<Lottery> appendLottery(List<Lottery> data, int startPosition, int count) {
         if (data == null) {
             data = new ArrayList<>();
         }
@@ -233,6 +233,7 @@ public class O {
 
             data.add(lottery);
         }
+        return data;
     }
 
     /**
