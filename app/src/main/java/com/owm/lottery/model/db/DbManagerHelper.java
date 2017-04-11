@@ -1,6 +1,7 @@
 package com.owm.lottery.model.db;
 
 import org.xutils.DbManager;
+import org.xutils.common.util.FileUtil;
 
 /**
  * Db 配置
@@ -23,6 +24,7 @@ public class DbManagerHelper {
                     daoConfig = new DbManager.DaoConfig()
                             .setDbName(DB_NAME)
                             .setDbVersion(DB_VERSION)
+                            .setDbDir(FileUtil.getCacheDir("lottery_db"))
                             .setDbOpenListener(new DbManager.DbOpenListener() {
                                 @Override
                                 public void onDbOpened(DbManager db) {

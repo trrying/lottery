@@ -14,8 +14,6 @@ import com.owm.lottery.model.db.dao.LotteryDao;
 import com.owm.lottery.model.utils.O;
 import com.owm.lottery.model.utils.SharedPreferencesUtil;
 
-import org.xutils.x;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,7 +55,7 @@ public class ComputeService extends Service {
             computeThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    compute(O.getComputeInfo(x.app()));
+                    compute(O.getComputeInfo());
                 }
             });
             computeThread.start();
@@ -133,7 +131,7 @@ public class ComputeService extends Service {
                             graphTemp.setGapExpect(i);
                             GraphDao.save(graphTemp);
                             //保存计算进度
-                            SharedPreferencesUtil.putCompute(x.app(), "" + expectSize + xSize + i + 0);
+                            SharedPreferencesUtil.putCompute(expectSize + "," + xSize + "," + i + "," + 0);
                         }
                     }
                 }

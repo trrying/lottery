@@ -1,6 +1,5 @@
 package com.owm.lottery.model.utils;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.owm.lottery.model.apiplus.Graph;
@@ -388,8 +387,8 @@ public class O {
         return result;
     }
 
-    public static int[] getComputeInfo(Context context) {
-        String compute = SharedPreferencesUtil.getCompute(context);
+    public static int[] getComputeInfo() {
+        String compute = SharedPreferencesUtil.getCompute();
         String[] split;
         if (O.isEmpty(compute) && (split = compute.split(",")).length == 4 && isNumeric(split)) {
             int[] ints = new int[split.length];

@@ -84,12 +84,10 @@ public class SettingFragment extends BaseFragment {
                     @Override
                     public String apply(String s) throws Exception {
                         StringBuilder result = new StringBuilder();
-                        result.append("汇总").append("\n")
-                                .append("总条数：" + GraphDao.selectCount() + " 条").append("\n")
-                                .append("准确率70%~80% : " + GraphDao.selectCountByPercentage(0.7f, 0.8f)).append("\n")
-                                .append("准确率80%~90% : " + GraphDao.selectCountByPercentage(0.8f, 0.9f)).append("\n")
-                                .append("准确率90%~100% : " + GraphDao.selectCountByPercentage(0.8f, 1.0f)).append("\n")
-                                .append("准确率100% : " + GraphDao.selectCountByPercentage(1.0f)).append("\n");
+                        result.append("汇总").append("\n").append("总条数：" + GraphDao.selectCount() + " 条").append("\n");
+                        for (int i = 0; i < 10; i++) {
+                            result.append("准确率").append(i*10).append("%~").append((i+1)*10).append("% : ").append(GraphDao.selectCountByPercentage(i/10.0f, (i+1)/10.0f)).append("\n");
+                        }
                         return result.toString();
                     }
                 })
