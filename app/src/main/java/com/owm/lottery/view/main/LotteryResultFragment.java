@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.owm.lottery.R;
 import com.owm.lottery.model.apiplus.Lottery;
 import com.owm.lottery.model.db.dao.LotteryDao;
@@ -26,7 +27,7 @@ import java.util.List;
  * Created by ouweiming on 2017/4/7.
  */
 @ContentView(R.layout.fragment_lottery_result)
-public class LotteryResultFragment extends BaseFragment implements ILotteryResult.LotteryResultView, SwipeRefreshLayout.OnRefreshListener {
+public class LotteryResultFragment extends BaseFragment implements ILotteryResult.LotteryResultView, SwipeRefreshLayout.OnRefreshListener, BaseQuickAdapter.RequestLoadMoreListener {
 
     @ViewInject(R.id.sw_refresh)
     private SwipeRefreshLayout sw_refresh;
@@ -86,6 +87,11 @@ public class LotteryResultFragment extends BaseFragment implements ILotteryResul
 
     @Override
     public void onRefresh() {
+        mPresenter.getData();
+    }
+
+    @Override
+    public void onLoadMoreRequested() {
         mPresenter.getData();
     }
 }

@@ -316,8 +316,8 @@ public class O {
 
         for (int i = 0; i < xSize; i++) {
             boolean isExist = false;
-            //获取随机坐标
-            int x = i == 0 ? 0 : random.nextInt(expectSize);
+            //获取随机坐标，第一个坐标x为0，其余x不等于0，保证只有一个未知数
+            int x = i == 0 ? 0 : random.nextInt(expectSize - 1) + 1;
             int y = random.nextInt(i == 0 ? 4 : ySize);
             //判断坐标是否出现过
             if (!result.isEmpty()) {
